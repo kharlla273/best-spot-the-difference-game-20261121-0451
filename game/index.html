@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Twin Tides — Spot the Difference</title>
+<style>
+  :root {
+    --ink: #22303c;
+    --panel: #fbf7ef;
+    --accent: #2f6e8f;
+    --gold: #ffd76a;
+    --green: #2fbf5a;
+    --red: #e2574c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: linear-gradient(180deg, #dfeef5 0%, #f6ecd7 100%);
+    color: var(--ink);
+    font-family: "Trebuchet MS", "Segoe UI", Verdana, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  header {
+    width: 1280px;
+    max-width: 100vw;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  header h1 {
+    font-size: 24px;
+    margin: 0 4px 0 0;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .stat {
+    background: var(--panel);
+    border: 2px solid #d8cdb4;
+    border-radius: 10px;
+    padding: 6px 9px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  #timer.low { color: var(--red); border-color: var(--red); }
+  .spacer { flex: 1; }
+  button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: 9px;
+    padding: 8px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button:hover { filter: brightness(1.12); }
+  button:disabled { background: #9aa8b2; cursor: default; }
+  button.active { background: #2f9e6e; }
+  button.ghost { background: #7c8a94; }
+  main { position: relative; width: 1280px; max-width: 100vw; padding: 0 14px; }
+  .panels { display: flex; gap: 14px; justify-content: center; }
+  .panel-wrap { position: relative; }
+  .panel-wrap canvas {
+    display: block;
+    width: 616px;
+    max-width: 48vw;
+    height: auto;
+    border: 4px solid #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(34, 48, 60, 0.25);
+    cursor: crosshair;
+    background: #bcd9e8;
+  }
+  .panel-tag {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    background: rgba(34, 48, 60, 0.75);
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 9px;
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  footer {
+    width: 1280px;
+    max-width: 100vw;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 16px 14px;
+  }
+  #hint-line { font-size: 15px; font-style: italic; color: #4a5a68; }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(24, 38, 52, 0.55);
+    border-radius: 12px;
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .card {
+    background: var(--panel);
+    border-radius: 16px;
+    padding: 28px 36px;
+    max-width: 560px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+  .card h2 { margin: 0 0 10px; color: var(--accent); font-size: 30px; }
+  .card p { font-size: 16px; line-height: 1.5; margin: 8px 0; }
+  .card .keys { font-size: 14px; color: #5a6b7a; }
+  .card button { font-size: 17px; padding: 11px 26px; margin-top: 12px; }
+  #lens {
+    position: fixed;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    display: none;
+    pointer-events: none;
+    z-index: 20;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Twin Tides</h1>
+  <span class="stat" id="level-name">Level 1 of 3 · Harbor Dawn</span>
+  <span class="stat" id="found-count">Found 0 / 7</span>
+  <span class="stat" id="timer">1:30</span>
+  <span class="stat" id="score">Score 0</span>
+  <span class="stat" id="best-score">Best 0</span>
+  <span class="spacer"></span>
+  <button id="hint-button" type="button">Hint (3)</button>
+  <button id="magnifier-button" type="button">Lens (L)</button>
+  <button id="pause-button" type="button">Pause (P)</button>
+  <button id="restart-button" type="button">Restart (R)</button>
+  <button id="sound-button" type="button" class="ghost">Sound on</button>
+</header>
+<main>
+  <div class="panels">
+    <div class="panel-wrap">
+      <span class="panel-tag">Picture A</span>
+      <canvas id="panel-left" width="640" height="480"></canvas>
+    </div>
+    <div class="panel-wrap">
+      <span class="panel-tag">Picture B</span>
+      <canvas id="panel-right" width="640" height="480"></canvas>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay-title">
+    <div class="card">
+      <h2>Twin Tides</h2>
+      <p><strong>Spot the Difference</strong> — two pictures that look the same, but seven things changed between them. Click a difference in either picture to ring it.</p>
+      <p>Three hand-painted scenes: Harbor Dawn, Meadow Cottage, Starry Camp. 90 seconds a level, 100 points a find, hints cost 50, wrong clicks cost 25.</p>
+      <p class="keys">Click to find · H hint · L magnifier lens · P pause · R restart</p>
+      <button id="start-button" type="button">Start the hunt</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="overlay-pause">
+    <div class="card">
+      <h2>Paused</h2>
+      <p>Take a breath. The tide is waiting.</p>
+      <button id="resume-button" type="button">Resume</button>
+      <button id="pause-restart-button" type="button" class="ghost">Restart level</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="overlay-level-done">
+    <div class="card">
+      <h2 id="level-done-title">Level complete!</h2>
+      <p id="level-done-body"></p>
+      <button id="level-done-button" type="button">Next level</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="overlay-game-over">
+    <div class="card">
+      <h2>Time's up!</h2>
+      <p id="game-over-body"></p>
+      <button id="retry-button" type="button">Try this level again</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="overlay-victory">
+    <div class="card">
+      <h2>All tides found!</h2>
+      <p id="victory-body"></p>
+      <button id="victory-button" type="button">Play again</button>
+    </div>
+  </div>
+</main>
+<footer>
+  <span id="hint-line">Click a difference in either picture — the ring appears on both.</span>
+</footer>
+<canvas id="lens" width="180" height="180"></canvas>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
