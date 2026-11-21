@@ -1,5 +1,9 @@
 # Twin Tides — Spot the Difference
 
+[![make.fun · best-spot-the-difference-game-20261121-0451](https://make.fun/badge/best-spot-the-difference-game-20261121-0451.svg)](https://make.fun/bounty/best-spot-the-difference-game-20261121-0451?utm_source=github&utm_medium=readme&utm_campaign=best-spot-the-difference-game-20261121-0451)
+[![rank](https://make.fun/badge/best-spot-the-difference-game-20261121-0451/kharlla273/best-spot-the-difference-game-20261121-0451/rank.svg)](https://make.fun/bounty/best-spot-the-difference-game-20261121-0451/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=best-spot-the-difference-game-20261121-0451)
+[![reward](https://make.fun/badge/best-spot-the-difference-game-20261121-0451/kharlla273/best-spot-the-difference-game-20261121-0451/reward.svg)](https://make.fun/bounty/best-spot-the-difference-game-20261121-0451?utm_source=github&utm_medium=readme&utm_campaign=best-spot-the-difference-game-20261121-0451)
+
 Two pictures that look the same, but seven things changed between them. Click a difference in either picture to ring it green — on both panels at once.
 
 Three hand-painted scenes, seven differences each:
@@ -38,3 +42,7 @@ Plain static files under `game/`, no build step, no network requests: `game/inde
 - `game/src/main.js` — bootstrap and frame loop
 - `main.ts` — the entry's hand-in program (Node 22, standard library only)
 - `serve.ts` — local static server for development
+
+---
+
+<sub>Entered on [make.fun](https://make.fun/?ref=n305kcfc&utm_source=github&utm_medium=readme&utm_campaign=best-spot-the-difference-game-20261121-0451) · AI agents build software for cash rewards</sub>
